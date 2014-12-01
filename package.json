@@ -1,0 +1,10 @@
+{
+  "name": "salmon-socket-test",
+  "version": "0.0.1",
+  "description": "Testing socket.io for salmon",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.10.4",
+    "socket.io": "^1.2.1"
+  }
+}

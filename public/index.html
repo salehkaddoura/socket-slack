@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Project Salmon - Socket.io</title>
+
+	<link rel="stylesheet" href="/stylesheets/bootstrap-theme.css">
+	<link rel="stylesheet" href="/stylesheets/bootstrap.css">
+	<link rel="stylesheet" href="/stylesheets/styles.css">
+</head>
+
+<body>
+
+	<div class="login-container">
+		<p>Enter your name:</p>
+		<div class="input-group">
+			<input id="username" type="text" class="form-control" placeholder="Username">
+			<span class="input-group-btn">
+        		<button id="name-submit" class="btn btn-primary" type="button">Go!</button>
+      		</span>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<div style="padding: 0" class="col-xs-3 chat-sidebar">
+				<ul id="user-list"></ul>
+			</div>
+			<div style="padding: 0" class="col-xs-9">
+				<div class="chat-window">
+					<ul id="message-wrap"></ul>
+				</div>
+				<form>
+					<div class="input-group">
+						<input id="message" autocomplete="off" placeholder="Type here....">
+						<span class="input-group-btn">
+	        				<button id="message-submit" class="btn btn-success" type="button">Go!</button>
+	      				</span>
+	      			</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="/scripts/bootstrap.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/scripts/script.js"></script>
+</body>
+
+</html>
