@@ -6,7 +6,7 @@ $('#set-name').submit(function(e) {
 	e.preventDefault();
 	var nickname = $('#username').val();
 	socket.emit('join', nickname, function(data) {
-	console.log(data);
+	// console.log(data);
 	if(data) {
 		$('.login-container').hide();
 		$('.chat-window').prepend('Connected to Salmon!');
@@ -28,6 +28,11 @@ $('#send-message').submit(function(e) {
 
 //GET THE RESPONSE FROM THE SERVER AND DISPLAY THE MESSAGES ON THE CLIENT
 socket.on('messages', function(data) {
+	// console.log(data);
+	$('#message-wrap').append('<li>' + data.nick + ': ' + data.msg + '</li>');
+});
+
+socket.on('whisper', function(data) {
 	console.log(data);
 	$('#message-wrap').append('<li>' + data.nick + ': ' + data.msg + '</li>');
 });
@@ -47,10 +52,18 @@ socket.on('allMessages', function(data) {
 
 //EVERYTIME A USER JOINS DISPLAY ALL USERNAMES ON THE CLIENT
 socket.on('usernames', function(data) {
-	console.log(data);
+	// console.log(data);
 	var names = '';
 	for(var i = 0; i < data.length; i++) {
 		names += data[i] + '<br/>';
 	}
 	$('#user-list').html(names);
+});
+
+socket.on('leave', function(data) {
+	$('#message-wrap').append(data + ' has left the room!<br/>');
+});
+
+socket.on('newuser', function(data) {
+	$('#message-wrap').append(data + ' has joined the room!<br/>');
 });

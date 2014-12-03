@@ -10,12 +10,17 @@ var userMessages = {
 	nick: [],
 	msg: []
 };
+
 var userList = {};
 
 //CONSOLE LOG CONNECT AND DISCONNECT TO SERVER
 io.on('connection', function(client) {
 	console.log('Client connected.....')
-	client.on('disconnect', function() {
+	client.on('disconnect', function(data) {
+		if(!client.nickname) return;
+		delete userList[client.nickname];
+		io.emit('leave', client.nickname);
+		updateUserNames();
 		console.log('Client disconnected....');
 	});
 });
@@ -26,6 +31,7 @@ io.on('connection', function(client) {
 	var message;
 	//ON CLIENT JOIN UPDATE ACTIVE USER LIST AND EMIT MESSAGES TO USER WHO JOINED
 	client.on('join', function(data, callback) {
+		io.emit('newuser', data);
 		console.log(data);
 		if(data in userList) {	
 			callback(false);
@@ -39,11 +45,28 @@ io.on('connection', function(client) {
 	});
 	//ON EVERY SENT MESSAGE STORE THE DATA IN THE userMessages{} AND EMIT THE DATA BACK TO THE CLIENT
 	client.on('messages', function(data, callback) {
-		console.log(data);
-		var msg = data;
-		var name = client.nickname;
-		storeMessage(name, msg);
-		io.emit('messages', {nick: name, msg: msg});
+		// console.log(data);
+		var msgArr = [];
+		var msg = data.trim();
+		if(msg.substring(0,2) === '/w') {
+			msgArr = msg.split(' ');
+			var newMsg = msgArr.splice(2, msgArr.length - 1);
+			newMsg = newMsg.join(' ');
+			var name = msgArr[1];
+			client.join(name);
+			// console.log('newMsg: ' + newMsg);
+			// console.log('name: ' + name);
+			if(name in userList) {
+				console.log('name found');
+				client.to(name).emit('whisper', {nick: client.nickname, msg: newMsg});
+			} else {
+				alert('user not found');
+			}
+		} else {
+			var name = client.nickname;
+			storeMessage(name, msg);
+			io.emit('messages', {nick: name, msg: msg});
+		}
 	});
 });
 
