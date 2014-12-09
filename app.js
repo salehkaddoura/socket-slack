@@ -12,8 +12,8 @@ var userMessages = {
 };
 
 var userList = {};
-
 var userId = [];
+var rooms = ['General', 'Random', 'Dev'];
 
 //CONSOLE LOG CONNECT AND DISCONNECT TO SERVER
 io.on('connection', function(client) {
@@ -32,18 +32,22 @@ io.on('connection', function(client) {
     var message;
     //ON CLIENT JOIN UPDATE ACTIVE USER LIST AND EMIT MESSAGES TO USER WHO JOINED
     client.on('join', function(data, callback) {
-        io.emit('newuser', data);
-        console.log('data:' + data);
-        console.log('id: ' + client.id);
+        // io.emit('roomsList', rooms);
+        // console.log('data:' + data);
+        // console.log('id: ' + client.id);
         if(data in userList) {
             callback(false);
         } else {
+            // Assigning each user to the General Room on Join
+            client.room = 'General';
+            client.join('General');
+            io.emit('newuser', 'SERVER:', data + ' has connected to ' + client.room);
+            io.emit('updaterooms', rooms, client.room);
+            // Adding each user to the userList Object
             client.nickname = data;
-            //userList[client.id] = client.id;
-            //storeUser(data, client.id);
-            // usernick = data.trim();
             userList[client.nickname] = client;
             userId.push(client.id);
+            // Updating the user name list and displaying all previous messages to each new user
             updateUserNames(data);
             updateMessages();
             callback(true);
@@ -59,9 +63,6 @@ io.on('connection', function(client) {
             var newMsg = msgArr.splice(2, msgArr.length - 1);
             newMsg = newMsg.join(' ');
             var name = msgArr[1];
-            // client.join(name);
-            // console.log('newMsg: ' + newMsg);
-            // console.log('name: ' + name);
             if(name in userList) {
                 console.log('name found');
                 userList[name].emit('whisper', {nick: client.nickname, msg: newMsg});
@@ -73,18 +74,22 @@ io.on('connection', function(client) {
             console.log(data);
             var name = client.nickname;
             storeMessage(name, msg);
-            io.emit('messages', {nick: name, msg: msg});
+            io.sockets.in(client.room).emit('messages', {nick: name, msg: msg});
         }
+    });
+
+    client.on('switchRoom', function(room, callback) {
+        client.leave(client.room);
+        client.join(room);
+        client.emit('newuser', 'SERVER: ', 'you have connected to ' + room);
+        client.room = room;
+        io.emit('updaterooms', rooms, client.room);
     });
 });
 
 function storeMessage(name, msg) {
     userMessages.nick.push(name);
     userMessages.msg.push(msg);
-}
-
-function storeUser(name, id) {
-    userList.push({nickName: name, userId: id});
 }
 
 function updateUserNames(name) {
