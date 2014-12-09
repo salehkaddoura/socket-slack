@@ -65,6 +65,7 @@ io.on('connection', function(client) {
             if(name in userList) {
                 console.log('name found');
                 userList[name].emit('whisper', {nick: client.nickname, msg: newMsg});
+                userList[client.nickname].emit('whisper', {nick: client.nickname, msg: newMsg});
             } else {
                 console.log('user not found');
             }
