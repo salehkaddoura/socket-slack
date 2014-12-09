@@ -8,6 +8,7 @@ $('#set-name').submit(function(e) {
 	socket.emit('join', nickname, function(data) {
 	// console.log(data);
 	if(data) {
+		$('.login-container-wrap').hide();
 		$('.login-container').hide();
 		$('.chat-window').prepend('Connected to Salmon!');
 	} else {
@@ -28,13 +29,13 @@ $('#send-message').submit(function(e) {
 
 //GET THE RESPONSE FROM THE SERVER AND DISPLAY THE MESSAGES ON THE CLIENT
 socket.on('messages', function(data) {
-	// console.log(data);
-	$('#message-wrap').append('<li>' + data.nick + ': ' + data.msg + '</li>');
+	console.log(data);
+	$('#message-wrap').append('<li><span class="user-identifier">' + data.nick + '</span>' + ' ' + data.msg + '</li>');
 });
 
 socket.on('whisper', function(data) {
-	console.log(data);
-	$('#message-wrap').append('<li>' + data.nick + ': ' + data.msg + '</li>');
+	console.log('whisper:' + data);
+	$('#message-wrap').append('<li class="whisper"><span class="user-identifier">' + data.nick + '</span>' + ' ' + data.msg + '</li>');
 });
 
 //EVERYTIME A USER JOINS DISPLAY ALL PREVIOUS MESSAGES ON THE CLIENT
@@ -44,7 +45,7 @@ socket.on('allMessages', function(data) {
 		for (var i = 0; i < data.nick.length; i++) {
 			var user = data.nick[i];
 			var message = data.msg[i];
-			$('#message-wrap').append('<li>' + user + ': ' + message + '</li>');
+			$('#message-wrap').append('<li><span class="user-identifier">' + user + '</span>' + ' ' + message + '</li>');
 		};
 	};
 	// console.log('all msgs: ' + data);
@@ -52,10 +53,10 @@ socket.on('allMessages', function(data) {
 
 //EVERYTIME A USER JOINS DISPLAY ALL USERNAMES ON THE CLIENT
 socket.on('usernames', function(data) {
-	// console.log(data);
+	// console.log(data.nick.length);
 	var names = '';
-	for(var i = 0; i < data.length; i++) {
-		names += data[i] + '<br/>';
+	for(var i = 0; i < data.nick.length; i++) {
+		names += '<li>' + data.nick[i] + '</li>';
 	}
 	$('#user-list').html(names);
 });

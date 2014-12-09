@@ -12,39 +12,34 @@
 
 <body>
 
+	<div class="login-container-wrap"></div>
 	<div class="login-container">
 		<p>Enter your name:</p>
 		<form id="set-name">
 			<div class="input-group">
 				<input id="username" type="text" class="form-control" placeholder="Username">
-				<span class="input-group-btn">
-	        		<button id="name-submit" class="btn btn-primary" type="button">Go!</button>
-	      		</span>
 			</div>
 		</form>
 	</div>
 
-	<div class="container">
-		<div class="row">
-			<div style="padding: 0" class="col-xs-3 chat-sidebar">
+	<div class="container-fluid container-wrap">
+		<div class="row row-fluid">
+			<div style="padding: 0" class="col-xs-2 chat-sidebar">
 				<ul id="user-list"></ul>
 			</div>
-			<div style="padding: 0" class="col-xs-9">
+			<div style="padding: 0" class="col-xs-10 chat-window-wrap">
 				<div class="chat-window">
 					<ul id="message-wrap"></ul>
 				</div>
 				<form id="send-message">
 					<div class="input-group">
 						<input id="message" autocomplete="off" placeholder="Type here....">
-						<span class="input-group-btn">
-	        				<button id="message-submit" class="btn btn-success" type="button">Go!</button>
-	      				</span>
 	      			</div>
 				</form>
 			</div>
 		</div>
 	</div>
-	
+
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 	<script src="/scripts/bootstrap.js"></script>
