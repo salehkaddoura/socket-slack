@@ -1,5 +1,5 @@
 #SALMON CHAT CLIENT
---------------------------------------------------
+
 Testing Socket.io capabilities to see if it is a viable option for the SALMON chat client.
 
 --------------------------------------------------
