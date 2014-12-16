@@ -12,3 +12,7 @@ Current features availible in test client
 - [x] switch between different channels/room
 
 --------------------------------------------------
+To play around with chat client; clone the repo and run
+```
+node app.js
+```
