@@ -16,3 +16,4 @@ To play around with chat client; clone the repo and run
 ```
 node app.js
 ```
+then point your browser to http://localhost:3000
