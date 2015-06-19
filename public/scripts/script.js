@@ -1,12 +1,23 @@
 var socket = io();
 var messages =  false;
 
+$(function() {
+    var d = new Date();
+    d = d.toLocaleString();
+
+    $('.timestamp').append(d);
+});
+
+function setDate() {
+    
+}
+
 //PASS THE NAME OF THE USER TO THE SERVER
 $('#set-name').submit(function(e) {
     e.preventDefault();
     var nickname = $('#username').val();
     socket.emit('join', nickname, function(data) {
-    // console.log(data);
+        console.log(data);
     if(data) {
         $('.login-container-wrap').hide();
         $('.login-container').hide();

@@ -1,0 +1,33 @@
+<style>
+    body {
+        padding-top: 80px;
+        background: url('/images/grey.png') repeat;
+    }
+</style>
+<div class="container">
+        <!-- show any messages that come back with authentication -->
+        {{#if message}}
+            <div class="alert alert-danger">{{message}}</div>
+        {{/if}}
+        
+        <!-- LOGIN FORM -->
+        <form class="login-form" action="/login" method="post">
+            <h1><i class="fa fa-weixin fa-fw"></i>Sidechat</h1>
+            <div class="form-group login-form-group">
+                <label>Username</label>
+                <input type="text" class="form-control" name="username">
+            </div>
+            <div class="form-group login-form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" name="password">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+
+            <hr>
+
+            <p>Need an account? <a href="/signup">Signup</a></p>
+            <p>Or go <a href="/home">home</a>.</p>
+        </form>
+
+</div>

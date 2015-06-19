@@ -2,9 +2,82 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
+var hbs = require('hbs');
+var morgan = require('morgan');
+var bodyParser = require('body-parser');
+var Parse = require('parse').Parse;
+var Promise = require('bluebird');
+var bcrypt = require('bcrypt');
 
-//ROUTING
+var port = process.env.PORT || 8080;
+
+Parse.initialize('1uN7c1hrqZYZWERAbTkdDVhx3OzF9jbKhHGoohmz', 'OTgZLemkKLORun2WGjSMqlM8bySuSXpJkQn9gu3R');
+
+// ROUTING
+app.set('view engine', 'html');
+app.engine('html', require('hbs').__express);
 app.use(express.static(__dirname + '/public'));
+
+app.use(morgan('dev')); // log every request to the console
+// app.use(cookieParser('ilovesaleh2')); // read cookies (needed for auth)
+app.use(bodyParser.json()); // get info from html forms
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// ROUTES
+app.get('/', function(req, res) {
+    res.render('index');
+});
+
+app.get('/signup', function(req, res) {
+    res.render('signup');
+});
+
+app.get('/home', function(req, res) {
+    res.render('home');
+});
+
+app.post('/signup', function(req, res) {
+    var username = req.body.username;
+    var birthday = new Date(req.body.birthday);
+    var password = req.body.password;
+
+    var UserQuery = Parse.Object.extend("Users");
+    var query = new Parse.Query(UserQuery);
+
+    query.equalTo("username", username);
+    query.find().then(function(userObj) {
+        if (userObj.length > 0) {
+            res.render('login', );
+            console.log('USER FOUND: ', userObj[0]);
+        } else {        
+            return hashpass(password).then(function(data) {
+                var newUser = new UserQuery();
+
+                newUser.set("username", username);
+                newUser.set("birthdate", birthday);
+                newUser.set("password", data);
+
+                return newUser.save();
+            });
+        }
+    }).then(function(data) {
+        res.render('home');
+    }, function(error) {
+        console.log(error);
+    })
+});
+
+function hashpass(pass) {
+    return new Promise(function(resolve, reject) {
+        bcrypt.hash(pass, 8, function(err, hash) {
+            if (err) {
+                reject(err);
+            }
+
+            resolve(hash);
+        });
+    });
+}
 
 var userMessages = {
     nick: [],
@@ -103,4 +176,5 @@ function updateMessages() {
     io.emit('allMessages', {nick: userMessages.nick, msg: userMessages.msg});
 }
 
-server.listen(3000)
+server.listen(port);
+console.log('The magic happens on port %d', port);
