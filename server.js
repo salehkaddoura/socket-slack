@@ -79,6 +79,10 @@ function hashpass(pass) {
     });
 }
 
+function getFriends(id) {
+    
+}
+
 var userMessages = {
     nick: [],
     msg: []
