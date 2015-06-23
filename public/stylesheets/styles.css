@@ -6,6 +6,10 @@ html, body {
     font-family: 'Open Sans';
 }
 
+.hidden {
+    display: none;
+}
+
 /* LOGIN CSS ====================================== */
 .login-form {
     max-width: 400px;
@@ -88,6 +92,14 @@ html, body {
 .timestamp {
     font-size: 0.7em;
     color: rgba(189, 195, 199, 1.0);
+}
+
+.online-icon {
+    color: #2ecc71;
+}
+
+.chat-sidebar .current-username {
+    font-size: 1em;
 }
 
 /*.login-container-wrap {

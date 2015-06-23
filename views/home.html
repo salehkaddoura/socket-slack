@@ -1,14 +1,18 @@
+<i class="hidden" id="user-id" data="{{data.userId}}"></i>
 <div class="container-fluid chat-container">
     <div class="row chat-row">
         <div class="col-xs-2 well chat-sidebar">
             <p><i class="fa fa-weixin fa-fw"></i>&nbsp; Sidechat</p>
+            {{#if data}}
+                <p class="current-username"><i class="fa fa-circle fa-fw online-icon"></i>&nbsp; {{data.username}}</p>
+            {{/if}}
             <div class="channel-container">
                 <p><i class="fa fa-comments fa-fw"></i>&nbsp; Channels</p>
             </div>
             <div class="users-container">
                 <p><i class="fa fa-user fa-fw"></i>&nbsp; Direct Messages</p>
             </div>
-            <button type="button" class="btn btn-danger"><i class="fa fa-sign-out fa-fw"></i>&nbsp; Logout</button>
+            <a href="/logout"><button type="button" class="btn btn-danger"><i class="fa fa-sign-out fa-fw"></i>&nbsp; Logout</button></a>
         </div>
         <div class="col-xs-10 messages-container">
             <div class="messages-window">

@@ -8,6 +8,10 @@ var bodyParser = require('body-parser');
 var Parse = require('parse').Parse;
 var Promise = require('bluebird');
 var bcrypt = require('bcrypt');
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+var flash = require('connect-flash');
+
 
 var port = process.env.PORT || 8080;
 
@@ -19,21 +23,75 @@ app.engine('html', require('hbs').__express);
 app.use(express.static(__dirname + '/public'));
 
 app.use(morgan('dev')); // log every request to the console
-// app.use(cookieParser('ilovesaleh2')); // read cookies (needed for auth)
+app.use(cookieParser('flap')); // read cookies (needed for auth)
 app.use(bodyParser.json()); // get info from html forms
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(session({ secret: 'ilovesaleh', resave: false, saveUninitialized: true }));
+app.use(flash());
 
 // ROUTES
 app.get('/', function(req, res) {
-    res.render('index');
+    if (req.cookies.user) {
+        res.redirect('/home');    
+    } else {
+        res.render('index');
+    }
 });
 
 app.get('/signup', function(req, res) {
-    res.render('signup');
+    if (req.cookies.user) {
+        res.redirect('/home');
+    } else {
+        res.render('signup');
+    }
 });
 
 app.get('/home', function(req, res) {
-    res.render('home');
+    if (req.cookies.user) {
+        getUserInfo(req.cookies.user).then(function(result) {
+            res.render('home', {data: result});    
+        });
+    } else {
+        res.redirect('/');
+    }
+    
+});
+
+app.post('/login', function(req, res) {
+    console.log(req.body);
+
+    var username = req.body.username;
+    var pass = req.body.password;
+
+    var UserQuery = Parse.Object.extend("Users");
+    var query = new Parse.Query(UserQuery);
+
+    query.equalTo("username", username);
+    query.first().then(function(userObj) {
+        var dbpass = userObj.get('password');
+        var userId = userObj.id;
+
+        return comparehash(pass, dbpass).then(function(data) {
+            if (data == null) {
+                res.render('index', {message: 'Wrong username and password. Please try again. :)'});
+            }
+
+            if (data) {
+                res.cookie('user', userId, { maxAge: 90000 });    
+                res.redirect('/home'); 
+            }
+        }).catch(function(e) {
+            console.log(e);
+
+            res.render('index', {message: 'Wrong username and password. Please try again. :)'});
+        });
+    });
+
+});
+
+app.get('/logout', function(req, res) {
+    res.clearCookie('user');
+    res.redirect('/');
 });
 
 app.post('/signup', function(req, res) {
@@ -47,10 +105,14 @@ app.post('/signup', function(req, res) {
     query.equalTo("username", username);
     query.find().then(function(userObj) {
         if (userObj.length > 0) {
-            res.render('login', );
-            console.log('USER FOUND: ', userObj[0]);
+            res.render('signup', { message: 'User already exists. Please ' });
+            return;
         } else {        
             return hashpass(password).then(function(data) {
+                if (data == null) {
+                    res.render('signup', {})
+                }
+
                 var newUser = new UserQuery();
 
                 newUser.set("username", username);
@@ -61,13 +123,25 @@ app.post('/signup', function(req, res) {
             });
         }
     }).then(function(data) {
-        res.render('home');
+        if (typeof(data) === "undefined") {
+            return;
+        }
+        
+        var username = data.get('username');
+        var userId = data.id;
+
+        res.cookie('user', userId, { maxAge: 90000 });
+        res.redirect('/home');     
     }, function(error) {
         console.log(error);
     })
 });
 
 function hashpass(pass) {
+    if (typeof(pass) === "undefined") {
+        return null;
+    }
+
     return new Promise(function(resolve, reject) {
         bcrypt.hash(pass, 8, function(err, hash) {
             if (err) {
@@ -79,8 +153,40 @@ function hashpass(pass) {
     });
 }
 
-function getFriends(id) {
-    
+function comparehash(pass, dbhash) {
+    if (typeof(pass) === "undefined") {
+        return null;
+    }
+
+    return new Promise(function(resolve, reject) {
+        bcrypt.compare(pass, dbhash, function(err, res) {
+            if (err) {
+                reject(err);
+            }
+
+            resolve(res);
+        });
+    });
+}
+
+function getUserInfo(id) {
+    return new Promise(function(resolve, reject) {
+        var UserQuery = Parse.Object.extend("Users");
+        var query = new Parse.Query(UserQuery);
+
+        query.equalTo("objectId", id);
+        query.first().then(function(data) {
+            console.log(data);
+            var obj = {};
+            obj["username"] = data.get('username');
+            obj["userId"] = data.id;
+
+            resolve(obj);
+        }, function(error) {
+            console.log(error);
+            reject(error);
+        });
+    });
 }
 
 var userMessages = {
